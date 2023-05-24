@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>VU-VRM</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <div class="backplate" id="backplate">
+    <h1>VU-VRM</h1>
+  </div>
+
+  <div id="messages" class="credits" onclick="hideinfo()">
+  </div>
+
+  <div id="infobar" class="infobar">
+    <p><small>Launch OBS with these arguments to use this as a Browser Source:</small></p>
+    <p><span class="highlight">--use-fake-ui-for-media-stream --allow-file-access-from-files</span></p>
+  </div>
+
+  <div class="interface" id="interface" onclick="interface()">
+
+    <div class="closebtn" id="closebtn" onclick="hideinterface()">❌</div>
+
+    <div class="sliders" id="sliders">
+
+      <p>
+        <span class="controlboxlabel">Input Volume VU</span>
+        <input type="range" min="0" max="100" value="10" class="slider" id="inputlevel">
+
+        <br>
+
+        <span class="controlboxlabel">Mouth Threshold</span>
+        <input type="range" min="0" max="50" value="10" class="slider" id="mouththreshold">
+
+        <br>
+        <span class="controlboxlabel">Body Threshold</span>
+        <input type="range" min="0" max="50" value="10" class="slider" id="bodythreshold">
+
+        <br>
+        <span class="controlboxlabel">Mouth Gain Boost</span>
+        <input type="range" min="0" max="25" value="10" class="slider" id="mouthboost">
+
+        <br>
+        <span class="controlboxlabel">Body Gain Boost</span>
+        <input type="range" min="0" max="25" value="10" class="slider" id="bodymotion">
+
+        <br>
+        <span class="controlboxlabel">Serious / Smiling</span>
+        <input type="range" min="0" max="100" value="80" class="slider" id="expression">
+
+      </p>
+
+    </div>
+
+    <div class="fileinput" id="fileinput">
+      <p>
+        <input id="file" class="file" type="file" accept=".vrm,.VRM" onchange="dofile()">
+      </p>
+    </div>
+
+
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.7/dist/bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
+
+  <script src="./vad-stt.js"></script>
+  <script src="./llm-msg.js"></script>
+  <script src="./coqui-tts.js"></script>
+  <script>
+    // Character sheet goes here, also the user can be defined. 
+    // State variables can be used to influence prompt.
+    // Experiment with W++ or any format that works with model.
+    // THIS IS JUST A PROTOTYPE, IMAGINE A DYNAMIC STATE!
+    let state = {
+      bot: {
+        name: 'Alli',
+        notes: '[*SFW* Alli is a playful and friendly sentient-AI who lives online and communicates via 3D avatars. blue eyes, brown hair, cute, smart, wordy, talkative, verbose, eloquent, intelligent.]',
+        mood: 'excited'
+      },
+      user: {
+        name: 'User',
+        sentiment: 'happy'
+      },
+      context: "describe the scene/scenario"
+    };
+
+    
+    // Display messages in UI
+    const messages = document.getElementById('messages');
+
+    // Setup WebAudio
+    const audioContext = new AudioContext();
+    const audioElement = new Audio();
+
+
+    //PIPELINE: STT->LLM->TTS->AudioContext
+    //YES THIS IS HACKY, we'll do things right later.
+
+
+    //Voice activity & transcription loop.
+    vadSTT();
+
+
+    // Listen for the 'STT' event on the body element
+    document.body.addEventListener('STT', (event) => {
+      let STTout = document.body.getAttribute('data-stt');
+      console.log("STT:" + STTout);
+      
+      //CALL the LLM function
+      koboldAI(STTout, state);
+
+      //BYPASS LLM BY CALLING THIS & COMMENT koboldAI() ABOVE (for testing)
+      //speak(STTout);
+    });
+
+    // Listen for the 'LLM' event on the body element
+    document.body.addEventListener('LLM', (event) => {
+      let LLMout = document.body.getAttribute('data-llm');
+      console.log("LLM:" + LLMout);
+
+      //CALL the TTS function
+      speak(LLMout);
+    });
+
+
+
+    // Saved for anyone who wants to use browser's built-in webspeech API...
+
+    // WEBSPEECH API - Automatic non-stop transcribe/send + pause on speech.
+    //const recognition = new (window.webkitSpeechRecognition || SpeechRecognition)();
+    //recognition.continuous = true;
+    //recognition.lang = 'en-US';
+    //
+    //recognition.onresult = (event) => {
+    //  const last = event.results.length - 1;
+    //  const message = event.results[last][0].transcript.trim();
+    //  messages.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+    //  socket.emit('message', message); //SEND TO LLM
+    //};
+
+    // Start recognition immediately
+    //recognition.start();
+    //recognition.onend = () => {
+    //  if (!speaking) {
+    //    recognition.start();
+    //    console.log("listening");
+    //  }
+    //};
+    //if (!speaking) {
+    //  recognition.start();
+    //  console.log("listening");
+    //};
+  </script>
+
+  <!-- BELOW IS FOR VU-VRM -->
+  <!-- three.min.js r110 -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.110.0/build/three.min.js"></script>
+  <!-- GLTFLoader.js -->
+  <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r110/examples/js/loaders/GLTFLoader.js"></script>
+  <!-- OrbitControls.js -->
+  <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r110/examples/js/controls/OrbitControls.js"></script>
+  <!-- pixiv three-vrm.js -->
+  <script src="https://unpkg.com/@pixiv/three-vrm@0.3.0/lib/three-vrm.js"></script>
+  <script src="./script.js"></script>
+
+</body>
+
+</html>
