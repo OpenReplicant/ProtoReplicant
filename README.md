@@ -2,7 +2,7 @@
 
 ![Image](/vrm-ui/assets/VU-VRM.gif?raw=true "VU-VRM")
 
-THIS IS AN EARLY POC/PROTOTYPE - FIGURE IT OUT ON YOUR OWN, OR DON'T.
+THIS IS AN EARLY POC/PROTOTYPE - FIGURE IT OUT ON YOUR OWN, OR DON'T. EXPERIMENTAL!
 
 The immediate goal is to provide a practical framework for multi-model AI agents.
 Using a web browser as the execution environment more than simply a thin client.
@@ -24,7 +24,7 @@ Internal architecture and components, as well as embodiments will be expanded on
 
  - python stt/main.py -m tiny -c cuda
 
- - python tts/server.py --port 5002 --model_name tts_models/en/ljspeech/glow-tts --vocoder_name vocoder_models/en/ljspeech/univnet --use_cuda True
+ - python tts/server.py --port 5002 --use_cuda True  (--help for how to lookup model names and specify them using --model_name --vocoder_name)
 
  - http-server vrm-ui/   
 
