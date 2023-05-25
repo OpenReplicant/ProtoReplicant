@@ -17,12 +17,12 @@ This should be into an interface for import/export of the user/bot object.
 
 Internal architecture and components, as well as embodiments will be expanded on.
 
-### RUN:
+### RUN: (using CUDA. omit those options for CPU)
 python stt/main.py -m tiny -c cuda
 
 python tts/server.py --port 5002 --model_name tts_models/en/ljspeech/glow-tts --vocoder_name vocoder_models/en/ljspeech/univnet --use_cuda True
 
-http-server vrm-ui/   (that's on NPM, or use any HTTP server)
+http-server vrm-ui/   (run 'npm i http-server' first if you have nodeJS, or use any HTTP server)
 
 
 #### Based on projects: (thank you devs!)
