@@ -12,6 +12,8 @@ To change avatars just drag and drop a VRM file onto the page. Ready for broadca
 Initial code is a simple pipeline to animate a 3D character with voice.
 VAD -> STT -> LLM -> TTS -> VRM
 
+You speak to it through your microphone, it transcribes you, sends that to Kobold Horde (pygmalion-6b default) and the returned text gets synthesized by coqui and played in the browser - which moves the mouth/face.
+
 LLM prompt template for character & chatlogs stored as persistent object.
 This should be into an interface for import/export of the user/bot object.
 
@@ -19,14 +21,11 @@ Internal architecture and components, as well as embodiments will be expanded on
 
 ### RUN: (using CUDA. omit those options for CPU)
  - pip install -r requirements.txt
-
  - npm i -g http-server' (if you have nodeJS, or use any HTTP server on last step)
-
  - python stt/main.py -m tiny -c cuda
-
  - python tts/server.py --port 5002 --use_cuda True  (--help for how to lookup model names and specify them using --model_name --vocoder_name)
-
- - http-server vrm-ui/   
+ - http-server vrm-ui
+ - (if you want to use an https://aihorde.net API key, insert it near the top of vrm-ui/llm-msg.js)
 
 
 #### Based on projects: (thank you devs!)
