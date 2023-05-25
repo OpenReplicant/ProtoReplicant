@@ -1,5 +1,7 @@
 ## Alli - OpenReplicant Alpha v0.1
 
+![Image](/vrm-ui/assets/VU-VRM.gif?raw=true "VU-VRM")
+
 THIS IS AN EARLY POC/PROTOTYPE - FIGURE IT OUT ON YOUR OWN, OR DON'T.
 
 The immediate goal is to provide a practical framework for multi-model AI agents.
