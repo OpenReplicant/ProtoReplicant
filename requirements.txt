@@ -1,0 +1,4 @@
+faster-whisper
+aiohttp
+aiohttp_cors
+TTS
